@@ -1,64 +1,79 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from "axios";
 
-export async function startToiletUsage(toilet_code) {
-  const savedUuid = localStorage.getItem("qlean_uuid");
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/guest/${toilet_code}/usage`,
+const getGuestUuid = () => {
+  return localStorage.getItem("guest_uuid");
+};
+
+const saveGuestUuid = (uuid) => {
+  localStorage.setItem("guest_uuid", uuid);
+};
+
+/**
+ * 화장실 이용량 카운트
+ * uuid가 없으면 null로 보내고,
+ * 서버에서 받은 uuid를 localStorage에 저장
+ */
+export const postGuestUsage = async (toilet_code) => {
+  const uuid = getGuestUuid();
+
+  console.log("usage 보내는 uuid:", uuid);
+
+  const response = await axios.post(
+    `${BASE_URL}/api/guest/${toilet_code}/usage`,
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uuid: savedUuid || null,
-      }),
+      uuid: uuid ?? null,
     },
   );
 
-  const result = await response.json();
+  console.log("usage 서버 반환 uuid:", response.data?.data?.uuid);
 
-  if (!response.ok) {
-    throw new Error(
-      result?.error?.message || "화장실 이용 요청에 실패했습니다.",
-    );
+  const returnedUuid = response.data?.data?.uuid;
+
+  if (returnedUuid) {
+    saveGuestUuid(returnedUuid);
   }
 
-  const uuid = result?.data?.uuid;
+  return response.data;
+};
 
-  if (uuid) {
-    localStorage.setItem("qlean_uuid", uuid);
-  }
+/**
+ * 설문 제출
+ */
+export const postGuestSurvey = async (toilet_code, survey) => {
+  const uuid = getGuestUuid();
 
-  return result;
-}
+  console.log("survey 보내는 uuid:", uuid);
 
-export async function submitToiletSurvey(toilet_code, survey) {
-  const savedUuid = localStorage.getItem("qlean_uuid");
-
-  if (!savedUuid) {
-    throw new Error("UUID가 없습니다.");
-  }
-
-  const response = await fetch(
-    `${API_BASE_URL}/api/guest/${toilet_code}/survey`,
+  const response = await axios.post(
+    `${BASE_URL}/api/guest/${toilet_code}/survey`,
     {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        survey,
-        uuid: savedUuid,
-      }),
+      survey,
+      uuid,
     },
   );
 
-  const result = await response.json();
+  console.log("survey 응답:", response.data);
 
-  if (!response.ok) {
-    throw new Error(result?.error?.message || "설문 제출에 실패했습니다.");
+  return response.data;
+};
+
+/**
+ * 랜덤 상품 추첨
+ */
+export const postGuestRandom = async () => {
+  const uuid = getGuestUuid();
+
+  console.log("랜덤 추첨 uuid:", uuid);
+
+  if (!uuid) {
+    throw new Error("GUEST_UUID_NOT_FOUND");
   }
 
-  return result;
-}
+  const response = await axios.post(`${BASE_URL}/api/guest/random`, {
+    uuid,
+  });
+
+  return response.data;
+};

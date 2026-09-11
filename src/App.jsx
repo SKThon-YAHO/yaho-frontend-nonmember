@@ -9,6 +9,7 @@ import SurveyPage from "./pages/Survey/SurveyPage";
 import RewardGuidePage from "./pages/Reward/RewardGuidePage";
 import RewardLoadingPage from "./pages/Reward/RewardLoadingPage";
 import RewardResultPage from "./pages/Reward/RewardResultPage";
+import UsageEndPage from "./pages/Usage/UsageEndPage";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
               path="/:toilet_code/reward/result"
               element={<RewardResultPage />}
             />
+
+            <Route path="/:toilet_code/usage-end" element={<UsageEndPage />} />
           </Route>
         </Routes>
       </AppFrame>

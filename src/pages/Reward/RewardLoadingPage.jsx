@@ -1,39 +1,61 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-export default function RewardLoadingPage() {
+import { postGuestRandom } from "../../api/guestApi";
+
+function RewardLoadingPage() {
   const navigate = useNavigate();
   const { toilet_code } = useParams();
 
   const [progress, setProgress] = useState(0);
 
+  const hasRequested = useRef(false);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+    if (hasRequested.current) return;
+
+    hasRequested.current = true;
+
+    const getReward = async () => {
+      try {
+        const response = await postGuestRandom();
+
+        console.log("랜덤 상품 API 응답:", response);
+
+        const reward = response.data;
+
+        if (!reward) {
+          console.error("상품 데이터가 없습니다.");
+          return;
         }
 
-        return prev + 2;
-      });
-    }, 50);
+        sessionStorage.setItem("reward_result", JSON.stringify(reward));
 
-    return () => clearInterval(interval);
-  }, []);
+        const interval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 100) {
+              clearInterval(interval);
 
-  useEffect(() => {
-    if (progress === 100) {
-      const timer = setTimeout(() => {
-        navigate(`/${toilet_code}/reward/result`, {
-          replace: true,
-        });
-      }, 300);
+              setTimeout(() => {
+                navigate(`/${toilet_code}/reward/result`, {
+                  replace: true,
+                });
+              }, 300);
 
-      return () => clearTimeout(timer);
-    }
-  }, [progress, navigate, toilet_code]);
+              return 100;
+            }
+
+            return prev + 2;
+          });
+        }, 50);
+      } catch (error) {
+        console.error("상품 추첨 실패", error);
+      }
+    };
+
+    getReward();
+  }, [navigate, toilet_code]);
 
   return (
     <Container>
@@ -52,13 +74,15 @@ export default function RewardLoadingPage() {
           <ProgressBar>
             <ProgressFill $progress={progress} />
           </ProgressBar>
-
-          <ProgressText>선물 추첨 중...</ProgressText>
         </ProgressWrapper>
+
+        <ProgressText>선물 추첨 중...</ProgressText>
       </Content>
     </Container>
   );
 }
+
+export default RewardLoadingPage;
 
 const Container = styled.main`
   width: 100%;
