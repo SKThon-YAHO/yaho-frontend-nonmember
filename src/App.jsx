@@ -6,6 +6,7 @@ import RootLayout from "./layout/RootLayout";
 import UsageStartPage from "./pages/Usage/UsageStartPage";
 import UsageEndPage from "./pages/Usage/UsageEndPage";
 import SurveyPage from "./pages/Survey/SurveyPage";
+import CompletePage from "./pages/Complete/CompletePage";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
             <Route path="/:toilet_code/usage" element={<UsageEndPage />} />
 
             <Route path="/:toilet_code/survey" element={<SurveyPage />} />
+
+            <Route path="/:toilet_code/complete" element={<CompletePage />} />
           </Route>
         </Routes>
       </AppFrame>

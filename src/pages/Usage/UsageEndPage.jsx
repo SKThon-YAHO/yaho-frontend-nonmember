@@ -11,7 +11,7 @@ function UsageEndPage() {
   const { toilet_code } = useParams();
 
   const handleEndUsage = () => {
-    navigate(`/guest/${toilet_code}/survey`);
+    navigate(`/${toilet_code}/survey`);
   };
 
   return (
