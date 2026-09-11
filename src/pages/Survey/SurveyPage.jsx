@@ -2,69 +2,155 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
-import PrimaryButton from "../../components/Button/PrimaryButton";
 import {
   Toilet,
-  WavesHorizontal,
-  Droplets,
-  Mop,
+  Waves,
+  Droplet,
+  BrushCleaning,
   DoorClosed,
   Cylinder,
   Bubbles,
-  Trash,
+  Trash2,
 } from "lucide-react";
+
+import PrimaryButton from "../../components/Button/PrimaryButton";
+import { submitToiletSurvey } from "../../api/guestApi";
 
 function SurveyPage() {
   const navigate = useNavigate();
-  const { toiletCode } = useParams();
+  const { toilet_code } = useParams();
 
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [survey, setSurvey] = useState({
+    clean: {
+      toilet: false,
+      urinal: false,
+      sink: false,
+      floor: false,
+    },
+    break: {
+      toilet: false,
+      urinal: false,
+      sink: false,
+      door: false,
+    },
+    item: {
+      soap: false,
+      paper: false,
+      trash: false,
+    },
+  });
 
   const categories = [
     {
       title: "청결",
+      key: "clean",
       items: [
-        { label: "대변기 더러워요", icon: Toilet },
-        { label: "소변기 더러워요", icon: WavesHorizontal },
-        { label: "세면대 더러워요", icon: Droplets },
-        { label: "바닥 더러워요", icon: Mop },
+        {
+          key: "toilet",
+          label: "대변기 더러워요",
+          icon: Toilet,
+        },
+        {
+          key: "urinal",
+          label: "소변기 더러워요",
+          icon: Waves,
+        },
+        {
+          key: "sink",
+          label: "세면대 더러워요",
+          icon: Droplet,
+        },
+        {
+          key: "floor",
+          label: "바닥 더러워요",
+          icon: BrushCleaning,
+        },
       ],
     },
     {
       title: "파손",
+      key: "break",
       items: [
-        { label: "대변기 고장났어요", icon: Toilet },
-        { label: "소변기 고장났어요", icon: WavesHorizontal },
-        { label: "세면대 고장났어요", icon: Droplets },
-        { label: "문이 안 잠겨요", icon: DoorClosed },
+        {
+          key: "toilet",
+          label: "대변기 고장났어요",
+          icon: Toilet,
+        },
+        {
+          key: "urinal",
+          label: "소변기 고장났어요",
+          icon: Waves,
+        },
+        {
+          key: "sink",
+          label: "세면대 고장났어요",
+          icon: Droplet,
+        },
+        {
+          key: "door",
+          label: "문이 잠기지 않아요",
+          icon: DoorClosed,
+        },
       ],
     },
     {
       title: "비품",
+      key: "item",
       items: [
-        { label: "휴지 없어요", icon: Cylinder },
-        { label: "비누 없어요", icon: Bubbles },
-        { label: "휴지통 가득 찼어요", icon: Trash },
+        {
+          key: "paper",
+          label: "휴지 없어요",
+          icon: Cylinder,
+        },
+        {
+          key: "soap",
+          label: "비누 없어요",
+          icon: Bubbles,
+        },
+        {
+          key: "trash",
+          label: "휴지통 가득 찼어요",
+          icon: Trash2,
+        },
       ],
     },
   ];
 
-  const handleSelect = (item) => {
-    setSelectedItems((prev) =>
-      prev.includes(item)
-        ? prev.filter((selected) => selected !== item)
-        : [...prev, item],
-    );
+  const handleSelect = (categoryKey, itemKey) => {
+    setSurvey((prev) => ({
+      ...prev,
+      [categoryKey]: {
+        ...prev[categoryKey],
+        [itemKey]: !prev[categoryKey][itemKey],
+      },
+    }));
   };
 
-  const handleSubmit = () => {
-    console.log("toiletCode:", toiletCode);
-    console.log("selectedItems:", selectedItems);
+  const handleSubmit = async () => {
+    if (isLoading) return;
 
-    // TODO: 추후 설문 API 연결
+    try {
+      setIsLoading(true);
+      setErrorMessage("");
 
-    navigate(`/${toiletCode}/complete`);
+      await submitToiletSurvey(toilet_code, survey);
+
+      navigate(`/${toilet_code}/complete`);
+    } catch (error) {
+      console.error(error);
+
+      setErrorMessage("설문 제출에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const hasSelected = Object.values(survey).some((category) =>
+    Object.values(category).some(Boolean),
+  );
 
   return (
     <Container>
@@ -76,21 +162,23 @@ function SurveyPage() {
 
       <SurveyContent>
         {categories.map((category) => (
-          <Category key={category.title}>
+          <Category key={category.key}>
             <CategoryTitle>{category.title}</CategoryTitle>
 
             <OptionList>
               {category.items.map((item) => {
-                const selected = selectedItems.includes(item.label);
+                const selected = survey[category.key][item.key];
+
                 const Icon = item.icon;
 
                 return (
                   <OptionButton
-                    key={item.label}
+                    key={item.key}
                     $selected={selected}
-                    onClick={() => handleSelect(item.label)}
+                    onClick={() => handleSelect(category.key, item.key)}
                   >
                     <Icon size={19} strokeWidth={2} />
+
                     <span>{item.label}</span>
                   </OptionButton>
                 );
@@ -101,10 +189,14 @@ function SurveyPage() {
       </SurveyContent>
 
       <BottomArea>
-        <PrimaryButton onClick={handleSubmit}>
-          {selectedItems.length === 0
-            ? "불편했던 점 없이 잘 이용했어요"
-            : "선택한 내용 제출하기"}
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+
+        <PrimaryButton onClick={handleSubmit} disabled={isLoading}>
+          {isLoading
+            ? "제출 중..."
+            : hasSelected
+              ? "선택한 내용 제출하기"
+              : "불편했던 점 없이 잘 이용했어요"}
         </PrimaryButton>
       </BottomArea>
     </Container>
@@ -130,7 +222,7 @@ const Container = styled.main`
 `;
 
 const Header = styled.header`
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 `;
 
 const Title = styled.h1`
@@ -157,13 +249,13 @@ const SurveyContent = styled.div`
 `;
 
 const Category = styled.section`
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 `;
 
 const CategoryTitle = styled.h2`
   margin: 0 0 14px;
 
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
 
   color: #30343f;
@@ -171,21 +263,23 @@ const CategoryTitle = styled.h2`
 
 const OptionList = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
   gap: 10px;
 `;
 
 const OptionButton = styled.button`
   width: 100%;
+  min-width: 0;
   min-height: 46px;
 
-  padding: 0 14px;
+  padding: 0 11px;
 
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
-  gap: 10px;
+  gap: 9px;
 
   border: 1px solid ${({ $selected }) => ($selected ? "#4C7FF0" : "#E8EAF0")};
 
@@ -202,7 +296,10 @@ const OptionButton = styled.button`
   box-shadow: ${({ $selected }) =>
     $selected ? "none" : "0 3px 10px rgba(0, 0, 0, 0.06)"};
 
-  transition: 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 
   svg {
     width: 19px;
@@ -217,9 +314,10 @@ const OptionButton = styled.button`
     display: flex;
     align-items: center;
 
+    min-width: 0;
     height: 19px;
-    line-height: 19px;
 
+    line-height: 19px;
     white-space: nowrap;
   }
 
@@ -231,5 +329,15 @@ const OptionButton = styled.button`
 const BottomArea = styled.div`
   width: 100%;
 
+  padding-top: 8px;
   padding-bottom: 25px;
+`;
+
+const ErrorMessage = styled.p`
+  margin: 0 0 12px;
+
+  color: #e25353;
+
+  font-size: 13px;
+  text-align: center;
 `;
