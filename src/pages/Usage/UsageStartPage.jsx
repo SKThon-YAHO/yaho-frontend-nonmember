@@ -6,7 +6,7 @@ import PrimaryButton from "../../components/Button/PrimaryButton";
 import { startToiletUsage } from "../../api/guestApi";
 
 import Logo from "../../assets/images/logo_image.png";
-import { Check } from "lucide-react";
+import DoorClosedIcon from "../../assets/images/icons/door_closed.svg";
 
 function UsageStartPage() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ function UsageStartPage() {
 
       <Content>
         <IconCircle>
-          <Check size={34} strokeWidth={2.6} color="#4C7FF0" />
+          <IconImage src={DoorClosedIcon} alt="문 닫힘" />
         </IconCircle>
 
         <Title>화장실을 이용하시겠어요?</Title>
@@ -70,7 +70,7 @@ const Container = styled.main`
   width: 100%;
   min-height: 770px;
 
-  padding: 32px 24px 24px;
+  padding: 32px 24px 80px;
 
   display: flex;
   flex-direction: column;
@@ -104,18 +104,23 @@ const Content = styled.section`
 `;
 
 const IconCircle = styled.div`
-  width: 72px;
-  height: 72px;
-
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   margin-bottom: 28px;
 
   background: #edf4ff;
+`;
+
+const IconImage = styled.img`
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
 `;
 
 const Title = styled.h1`
