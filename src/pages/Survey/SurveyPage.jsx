@@ -138,7 +138,7 @@ function SurveyPage() {
 
       await submitToiletSurvey(toilet_code, survey);
 
-      navigate(`/${toilet_code}/complete`);
+      navigate(`/${toilet_code}/reward/loading`);
     } catch (error) {
       console.error(error);
 

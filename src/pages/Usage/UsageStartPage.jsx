@@ -11,7 +11,6 @@ import DoorClosedIcon from "../../assets/images/icons/door_closed.svg";
 function UsageStartPage() {
   const navigate = useNavigate();
   const { toilet_code } = useParams();
-  console.log("toilet_code:", toilet_code);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,7 +24,7 @@ function UsageStartPage() {
 
       await startToiletUsage(toilet_code);
 
-      navigate(`/${toilet_code}/usage`);
+      navigate(`/${toilet_code}/reward`);
     } catch (error) {
       console.error(error);
 
