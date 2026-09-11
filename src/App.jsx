@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import styled from "styled-components";
 
-import RootLayout from "./layout/RootLayout.jsx";
+import RootLayout from "./layout/RootLayout";
 
-import UsagePage from "./pages/Usage/UsagePage.jsx";
-import SurveyPage from "./pages/Survey/SurveyPage.jsx";
-import CompletePage from "./pages/Complete/CompletePage.jsx";
+import UsageStartPage from "./pages/Usage/UsageStartPage";
+import UsageEndPage from "./pages/Usage/UsageEndPage";
+import SurveyPage from "./pages/Survey/SurveyPage";
 
 function App() {
   return (
@@ -13,9 +13,11 @@ function App() {
       <AppFrame>
         <Routes>
           <Route element={<RootLayout />}>
-            <Route path="/" element={<UsagePage />} />
-            <Route path="/survey" element={<SurveyPage />} />
-            <Route path="/complete" element={<CompletePage />} />
+            <Route path="/:toilet_code" element={<UsageStartPage />} />
+
+            <Route path="/:toilet_code/usage" element={<UsageEndPage />} />
+
+            <Route path="/:toilet_code/survey" element={<SurveyPage />} />
           </Route>
         </Routes>
       </AppFrame>
@@ -27,10 +29,11 @@ export default App;
 
 const AppFrame = styled.div`
   width: 100%;
-  max-width: 361px;
+  max-width: 371px;
   min-height: 770px;
 
   margin: 0 auto;
+
   background: #ffffff;
 
   position: relative;
@@ -38,7 +41,6 @@ const AppFrame = styled.div`
 
   @media (max-width: 390px) {
     max-width: 100%;
-    width: 100%;
     min-height: 100dvh;
   }
 `;
