@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import PrimaryButton from "../../components/Button/PrimaryButton";
-import { startToiletUsage } from "../../api/guestApi";
+import { postGuestUsage } from "../../api/guestApi";
 
 import Logo from "../../assets/images/logo_image.png";
 import DoorClosedIcon from "../../assets/images/icons/door_closed.svg";
@@ -22,7 +22,7 @@ function UsageStartPage() {
       setIsLoading(true);
       setErrorMessage("");
 
-      await startToiletUsage(toilet_code);
+      await postGuestUsage(toilet_code);
 
       navigate(`/${toilet_code}/reward`);
     } catch (error) {
