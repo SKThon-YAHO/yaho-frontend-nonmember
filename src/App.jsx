@@ -4,9 +4,12 @@ import styled from "styled-components";
 import RootLayout from "./layout/RootLayout";
 
 import UsageStartPage from "./pages/Usage/UsageStartPage";
-import UsageEndPage from "./pages/Usage/UsageEndPage";
 import SurveyPage from "./pages/Survey/SurveyPage";
-import CompletePage from "./pages/Complete/CompletePage";
+
+import RewardGuidePage from "./pages/Reward/RewardGuidePage";
+import RewardLoadingPage from "./pages/Reward/RewardLoadingPage";
+import RewardResultPage from "./pages/Reward/RewardResultPage";
+import UsageEndPage from "./pages/Usage/UsageEndPage";
 
 function App() {
   return (
@@ -16,11 +19,21 @@ function App() {
           <Route element={<RootLayout />}>
             <Route path="/:toilet_code" element={<UsageStartPage />} />
 
-            <Route path="/:toilet_code/usage" element={<UsageEndPage />} />
+            <Route path="/:toilet_code/reward" element={<RewardGuidePage />} />
 
             <Route path="/:toilet_code/survey" element={<SurveyPage />} />
 
-            <Route path="/:toilet_code/complete" element={<CompletePage />} />
+            <Route
+              path="/:toilet_code/reward/loading"
+              element={<RewardLoadingPage />}
+            />
+
+            <Route
+              path="/:toilet_code/reward/result"
+              element={<RewardResultPage />}
+            />
+
+            <Route path="/:toilet_code/usage-end" element={<UsageEndPage />} />
           </Route>
         </Routes>
       </AppFrame>
@@ -34,7 +47,6 @@ const AppFrame = styled.div`
   width: 100%;
   max-width: 371px;
   min-height: 770px;
-
   margin: 0 auto;
 
   background: #ffffff;

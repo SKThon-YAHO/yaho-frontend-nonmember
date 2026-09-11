@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 import PrimaryButton from "../../components/Button/PrimaryButton";
-import { startToiletUsage } from "../../api/guestApi";
+import { postGuestUsage } from "../../api/guestApi";
 
 import Logo from "../../assets/images/logo_image.png";
 import DoorClosedIcon from "../../assets/images/icons/door_closed.svg";
@@ -11,7 +11,6 @@ import DoorClosedIcon from "../../assets/images/icons/door_closed.svg";
 function UsageStartPage() {
   const navigate = useNavigate();
   const { toilet_code } = useParams();
-  console.log("toilet_code:", toilet_code);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,9 +22,9 @@ function UsageStartPage() {
       setIsLoading(true);
       setErrorMessage("");
 
-      await startToiletUsage(toilet_code);
+      await postGuestUsage(toilet_code);
 
-      navigate(`/${toilet_code}/usage`);
+      navigate(`/${toilet_code}/reward`);
     } catch (error) {
       console.error(error);
 

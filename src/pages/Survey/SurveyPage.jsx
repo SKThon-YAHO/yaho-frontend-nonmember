@@ -14,14 +14,11 @@ import {
 } from "lucide-react";
 
 import PrimaryButton from "../../components/Button/PrimaryButton";
-import { submitToiletSurvey } from "../../api/guestApi";
+import { postGuestSurvey } from "../../api/guestApi";
 
 function SurveyPage() {
   const navigate = useNavigate();
   const { toilet_code } = useParams();
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const [survey, setSurvey] = useState({
     clean: {
@@ -30,18 +27,23 @@ function SurveyPage() {
       sink: false,
       floor: false,
     },
+
     break: {
       toilet: false,
       urinal: false,
       sink: false,
       door: false,
     },
+
     item: {
       soap: false,
       paper: false,
       trash: false,
     },
   });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const categories = [
     {
@@ -70,6 +72,7 @@ function SurveyPage() {
         },
       ],
     },
+
     {
       title: "파손",
       key: "break",
@@ -96,6 +99,7 @@ function SurveyPage() {
         },
       ],
     },
+
     {
       title: "비품",
       key: "item",
@@ -122,6 +126,7 @@ function SurveyPage() {
   const handleSelect = (categoryKey, itemKey) => {
     setSurvey((prev) => ({
       ...prev,
+
       [categoryKey]: {
         ...prev[categoryKey],
         [itemKey]: !prev[categoryKey][itemKey],
@@ -132,17 +137,21 @@ function SurveyPage() {
   const handleSubmit = async () => {
     if (isLoading) return;
 
+    setIsLoading(true);
+    setErrorMessage("");
+
     try {
-      setIsLoading(true);
-      setErrorMessage("");
+      const response = await postGuestSurvey(toilet_code, survey);
 
-      await submitToiletSurvey(toilet_code, survey);
-
-      navigate(`/${toilet_code}/complete`);
+      if (response.is_valid) {
+        navigate(`/${toilet_code}/reward/loading`);
+      } else {
+        navigate(`/${toilet_code}/usage-end`);
+      }
     } catch (error) {
-      console.error(error);
+      console.error("설문 제출 실패", error);
 
-      setErrorMessage("설문 제출에 실패했습니다. 다시 시도해 주세요.");
+      setErrorMessage("설문 제출에 실패했어요. 잠시 후 다시 시도해 주세요.");
     } finally {
       setIsLoading(false);
     }
@@ -174,6 +183,7 @@ function SurveyPage() {
                 return (
                   <OptionButton
                     key={item.key}
+                    type="button"
                     $selected={selected}
                     onClick={() => handleSelect(category.key, item.key)}
                   >
@@ -213,6 +223,8 @@ const Container = styled.main`
   flex-direction: column;
 
   padding: 48px 24px 24px;
+
+  box-sizing: border-box;
 
   background: #ffffff;
 
@@ -263,6 +275,7 @@ const CategoryTitle = styled.h2`
 
 const OptionList = styled.div`
   display: grid;
+
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 10px;
@@ -296,6 +309,8 @@ const OptionButton = styled.button`
   box-shadow: ${({ $selected }) =>
     $selected ? "none" : "0 3px 10px rgba(0, 0, 0, 0.06)"};
 
+  cursor: pointer;
+
   transition:
     transform 0.15s ease,
     background 0.15s ease,
@@ -318,6 +333,7 @@ const OptionButton = styled.button`
     height: 19px;
 
     line-height: 19px;
+
     white-space: nowrap;
   }
 
@@ -339,5 +355,6 @@ const ErrorMessage = styled.p`
   color: #e25353;
 
   font-size: 13px;
+
   text-align: center;
 `;
