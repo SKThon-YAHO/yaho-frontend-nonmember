@@ -12,7 +12,7 @@ export const rewardDummy = {
     issuer: "Qlean",
     expireDate: "2026.12.31",
     image: voucherImage,
-    color: "#ea580c",
+    color: "#F28C52", // 연한 오렌지
   },
 
   tissue: {
@@ -23,18 +23,18 @@ export const rewardDummy = {
     issuer: "Qlean",
     expireDate: "2026.12.31",
     image: tissueImage,
-    color: "#2563eb",
+    color: "#93B4F5", // 연한 블루
   },
 
   pepero: {
     type: "reward",
-    name: "빼뺴로",
+    name: "빼빼로",
     quantity: "1개",
     code: "102145011149",
     issuer: "Qlean",
     expireDate: "2026.12.31",
     image: peperoImage,
-    color: "#92400e",
+    color: "#B97852", // 연한 브라운
   },
 
   candy: {
@@ -45,7 +45,7 @@ export const rewardDummy = {
     issuer: "Qlean",
     expireDate: "2026.12.31",
     image: candyImage,
-    color: "#db2777",
+    color: "#F5A3C7", // 연한 핑크
   },
 
   lose: {
