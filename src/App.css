@@ -1,0 +1,22 @@
+.app {
+  width: 100%;
+  max-width: 361px;
+
+  min-height: 770px;
+
+  margin: 0 auto;
+
+  position: relative;
+  overflow-x: hidden;
+}
+
+@media (max-width: 390px) {
+  .app {
+    max-width: 100%;
+    width: 100%;
+    min-height: 100dvh;
+
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
